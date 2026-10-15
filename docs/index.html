@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prism, un lanceur pour macOS</title>
+<meta name="description" content="Prism est un lanceur pour macOS inspiré de Raycast : apps, calculatrice, presse-papiers, snippets, fenêtres, IA, notes et extensions Raycast, derrière ⌥ Espace. Natif, open source, gratuit.">
+<meta name="theme-color" content="#07060b">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/icon-256.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Prism, un lanceur pour macOS">
+<meta property="og:description" content="Apps, calculs, presse-papiers, fenêtres, IA et extensions Raycast derrière ⌥ Espace. Natif, open source, gratuit.">
+<meta property="og:url" content="https://guillaume69.github.io/prism/">
+<meta property="og:image" content="https://guillaume69.github.io/prism/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script defer src="assets/hero.js"></script>
+<script defer src="assets/main.js"></script>
+</head>
+<body>
+
+<a class="skip" href="#barre">Aller au contenu</a>
+
+<!-- Barre de navigation, visible une fois la scène d'ouverture passée -->
+<nav class="nav" id="nav" aria-label="Navigation principale">
+  <a class="nav-brand" href="#top"><img src="img/favicon.png" alt="" width="24" height="24"> Prism</a>
+  <div class="nav-links">
+    <a href="#barre">La barre</a>
+    <a href="#spectre">Fonctionnalités</a>
+    <a href="#themes">Thèmes</a>
+    <a href="#tout">Tout le reste</a>
+    <a href="#installer">Installer</a>
+  </div>
+  <button class="nav-try" type="button" data-open-launcher><span class="kbd">⌥</span><span class="kbd">Espace</span></button>
+  <a class="btn btn-small" href="https://github.com/Guillaume69/prism/releases/latest" data-download>Télécharger</a>
+</nav>
+
+<!-- ─────────────── Scène d'ouverture ─────────────── -->
+<header class="hero" id="top">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="hero-scan" aria-hidden="true"></div>
+
+  <div class="hud hud-top" aria-hidden="true">
+    <div class="hud-brand"><img src="img/favicon.png" alt="" width="20" height="20"><span>PRISM</span><span class="hud-dim" data-version>v2.0</span></div>
+    <div class="hud-dim hud-hide-sm">LANCEUR · MACOS 14+ · APPLE SILICON &amp; INTEL</div>
+  </div>
+
+  <aside class="hud hud-panel" aria-hidden="true">
+    <div class="hud-title"><span class="dot"></span>OPTIQUE · TEMPS RÉEL</div>
+    <dl>
+      <div><dt>Incidence</dt><dd id="hud-inc">49,5°</dd></div>
+      <div><dt>Déviation</dt><dd id="hud-dev">38,9°</dd></div>
+      <div><dt>n (589 nm)</dt><dd id="hud-n">1,520</dd></div>
+      <div><dt>Étalement</dt><dd id="hud-spread">—</dd></div>
+      <div><dt>Dispersion</dt><dd id="hud-k">×8</dd></div>
+      <div><dt><span class="lc">λ</span> curseur</dt><dd id="hud-lambda">—</dd></div>
+    </dl>
+    <div class="hud-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="hud-toggles">
+      <button type="button" id="toggle-k">Dispersion <b>×8</b></button>
+      <button type="button" id="toggle-sound" aria-pressed="false">Son <b>off</b></button>
+    </div>
+  </aside>
+
+  <div class="hero-copy">
+    <p class="eyebrow"><span class="eyebrow-line"></span>Un lanceur pour macOS · open source</p>
+    <h1 class="title" data-text="PRISM">PRISM</h1>
+    <p class="lead">Une touche, <span class="kbd kbd-lg">⌥</span><span class="kbd kbd-lg">Espace</span>, et tout le Mac tient dans une barre&nbsp;: apps, calculs, presse-papiers, snippets, fenêtres, IA et extensions Raycast.</p>
+    <p class="sub">Natif, gratuit, inspiré de Raycast, fonctionnalités Pro comprises. Vos données restent sur le Mac, sauf ce que vous envoyez vous-même à un service.</p>
+    <div class="cta">
+      <a class="btn btn-prism" href="https://github.com/Guillaume69/prism/releases/latest" data-download>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>
+        <span>Télécharger <span class="hide-sm" data-version-label>Prism 2.0</span></span>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/Guillaume69/prism">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1.3-4-2-6-2.5m12 5v-3.4a3 3 0 0 0-.8-2.3c2.7-.3 5.6-1.3 5.6-6a4.6 4.6 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6 0C6.6 1.6 5.6 1.9 5.6 1.9a4.3 4.3 0 0 0-.1 3.2A4.6 4.6 0 0 0 4.2 8.3c0 4.7 2.9 5.7 5.6 6a3 3 0 0 0-.8 2.3V20"/></svg>
+        <span>Code source</span>
+      </a>
+    </div>
+    <p class="fine"><span data-size>12 Mo</span> · macOS 14 ou plus · licence MIT</p>
+  </div>
+
+  <div class="spectrum-labels" id="spectrum-labels" aria-label="Les six familles de fonctionnalités">
+    <a href="#rouge" style="--c:var(--red)"><small>λ 647 nm</small>Recherche</a>
+    <a href="#orange" style="--c:var(--orange)"><small>λ 569 nm</small>Presse-papiers</a>
+    <a href="#jaune" style="--c:var(--yellow)"><small>λ 513 nm</small>IA</a>
+    <a href="#vert" style="--c:var(--green)"><small>λ 471 nm</small>Fenêtres</a>
+    <a href="#bleu" style="--c:var(--blue)"><small>λ 438 nm</small>Notes</a>
+    <a href="#violet" style="--c:var(--violet)"><small>λ 411 nm</small>Extensions</a>
+  </div>
+
+  <div class="hud hud-keys" aria-hidden="true">
+    <span><b>Bouger</b> orienter le rayon</span>
+    <span><b>Clic</b> flash</span>
+    <span class="hide-touch"><b>D</b> dispersion</span>
+    <span class="hide-touch"><b>S</b> son</span>
+    <span class="hide-touch"><b>⌥ Espace</b> ouvrir la barre</span>
+  </div>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-badge">⟁ PRISM --CALC</div>
+    <div class="ticker-track">
+      <div class="ticker-run" id="ticker-run"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ─────────────── La barre ─────────────── -->
+<section class="section" id="barre">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="kicker"><span>01</span> La barre</p>
+      <h2 class="h2" data-text="Tapez. Prism comprend.">Tapez. Prism comprend.</h2>
+      <p class="lede">Une seule barre pour lancer une app, convertir des dollars, demander l’heure à Tokyo ou poser une question à l’IA. Cette vidéo est une vraie session&nbsp;: chaque image est un rendu de l’app.</p>
+    </header>
+
+    <div class="player">
+      <ol class="chapters" id="chapters"></ol>
+      <div class="stage tilt">
+        <div class="stage-glow" aria-hidden="true"></div>
+        <div class="window-shot launcher-shot">
+          <video id="launcher-video" muted loop playsinline preload="none" poster="img/launcher-poster.jpg" width="1520" height="952" aria-label="Session de Prism : recherche d’une app, actions, devises, fuseau horaire, pourcentage, couleur, traduction et Quick AI">
+            <source src="media/launcher.mp4" type="video/mp4">
+          </video>
+          <div class="glare" aria-hidden="true"></div>
+        </div>
+        <div class="progress" aria-hidden="true"><i id="video-progress"></i></div>
+      </div>
+    </div>
+
+    <ul class="keys-row">
+      <li><span class="kbd">↑</span><span class="kbd">↓</span> parcourir</li>
+      <li><span class="kbd">↵</span> action principale</li>
+      <li><span class="kbd">⌘</span><span class="kbd">K</span> toutes les actions</li>
+      <li><span class="kbd">Tab</span> demander à l’IA</li>
+      <li><span class="kbd">⌘</span><span class="kbd">1</span>…<span class="kbd">9</span> favoris</li>
+      <li><span class="kbd">Échap</span> fermer</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─────────────── Le spectre ─────────────── -->
+<section class="section spectrum-intro" id="spectre">
+  <div class="wrap">
+    <header class="sec-head center">
+      <p class="kicker"><span>02</span> Le spectre</p>
+      <h2 class="h2" data-text="Un rayon, six couleurs">Un rayon, six couleurs</h2>
+      <p class="lede">Un prisme décompose la lumière blanche. Prism décompose votre Mac en six familles de commandes, toutes au même endroit.</p>
+    </header>
+    <div class="spectrum-bar" aria-hidden="true">
+      <a href="#rouge" style="--c:var(--red)"><span>Recherche</span></a>
+      <a href="#orange" style="--c:var(--orange)"><span>Presse-papiers</span></a>
+      <a href="#jaune" style="--c:var(--yellow)"><span>IA</span></a>
+      <a href="#vert" style="--c:var(--green)"><span>Fenêtres</span></a>
+      <a href="#bleu" style="--c:var(--blue)"><span>Notes</span></a>
+      <a href="#violet" style="--c:var(--violet)"><span>Extensions</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- Rouge : recherche et calcul -->
+<section class="band" id="rouge" style="--c:var(--red); --c-rgb:255,69,84">
+  <div class="wrap band-grid">
+    <div class="band-text reveal">
+      <p class="band-tag"><span class="swatch"></span><span class="lc">λ</span> 647 nm · Rouge</p>
+      <h3 class="h3">Chercher, calculer</h3>
+      <p>Apps, commandes, réglages système, fichiers, contacts, jeux Steam&nbsp;: la recherche est floue, sans accents, et accepte les initiales («&nbsp;vsc&nbsp;»).</p>
+      <p>La calculatrice répond pendant que vous tapez&nbsp;: unités, devises et cryptos au taux du jour, fuseaux horaires, dates, couleurs, bases, pourcentages à la Soulver. ↵ copie le résultat.</p>
+      <ul class="chips">
+        <li>Alias et raccourcis par commande</li><li>Double appui sur ⌘ ⌥ ⌃ ⇧</li><li>Favoris ⌘1 à ⌘9</li><li>Recherches de repli</li><li>Mode compact</li><li>Liens profonds prism://</li>
+      </ul>
+    </div>
+    <div class="band-visual reveal">
+      <div class="console" id="calc-console" aria-label="Réponses réelles de la calculatrice de Prism">
+        <div class="console-bar"><i></i><i></i><i></i><span>Prism --calc</span></div>
+        <div class="console-body" id="calc-lines"></div>
+        <p class="console-note">Réponses réelles de la calculatrice, relevées le 15 octobre 2026.</p>
+      </div>
+      <figure class="shot shot-float" style="--w:56%; --x:46%; --y:62%">
+        <img src="img/translate.jpg" alt="Prism traduit « bonjour en anglais » : hello" width="1520" height="952" loading="lazy">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Orange : presse-papiers et snippets -->
+<section class="band band-flip" id="orange" style="--c:var(--orange); --c-rgb:255,140,51">
+  <div class="wrap band-grid">
+    <div class="band-text reveal">
+      <p class="band-tag"><span class="swatch"></span><span class="lc">λ</span> 569 nm · Orange</p>
+      <h3 class="h3">Presse-papiers, snippets</h3>
+      <p>Tout ce que vous copiez est gardé&nbsp;: texte, texte riche, images, fichiers, liens, couleurs. Le texte des images est reconnu, les QR codes aussi. Épinglez, renommez, collez en texte brut ou en séquence.</p>
+      <p>Les snippets se développent dans toutes les apps&nbsp;: tapez <code>;sig</code>, la signature apparaît. Placeholders <code>{clipboard}</code>, <code>{date}</code>, <code>{cursor}</code>, import et export au format de Raycast.</p>
+      <ul class="chips">
+        <li>Filtre par type</li><li>Apps ignorées</li><li>Rétention réglable</li><li>Liens rapides avec arguments</li><li>1 915 emojis, 360 symboles</li>
+      </ul>
+    </div>
+    <div class="band-visual reveal">
+      <figure class="shot" style="--w:90%; --x:0%; --y:0%">
+        <img src="img/clipboard.jpg" alt="Historique du presse-papiers de Prism : une image dont le texte a été reconnu, une couleur, un e-mail" width="1520" height="952" loading="lazy">
+      </figure>
+      <figure class="shot shot-float" style="--w:56%; --x:46%; --y:52%">
+        <img src="img/snippets.jpg" alt="Les snippets de Prism, avec leurs mots-clés" width="1520" height="952" loading="lazy">
+      </figure>
+      <figure class="shot shot-float" style="--w:40%; --x:-4%; --y:60%">
+        <img src="img/emoji.jpg" alt="Recherche d’emojis : feu" width="1520" height="952" loading="lazy">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Jaune : IA -->
+<section class="band" id="jaune" style="--c:var(--yellow); --c-rgb:255,214,64">
+  <div class="wrap band-grid">
+    <div class="band-text reveal">
+      <p class="band-tag"><span class="swatch"></span><span class="lc">λ</span> 513 nm · Jaune</p>
+      <h3 class="h3">L’IA, avec vos modèles</h3>
+      <p>Tab envoie la saisie à Quick AI. Une fenêtre de chat complète (historique, branches, pièces jointes, dictée), des commandes d’IA qui remplacent la sélection.</p>
+      <p>Apple Intelligence tourne sur l’appareil, gratuit et par défaut. Ou Ollama, OpenAI, Anthropic, avec vos clés rangées dans le trousseau. Pas de crédits à acheter.</p>
+      <ul class="chips">
+        <li>Agents et projets</li><li>Skills <code>SKILL.md</code></li><li>Serveurs MCP</li><li>16 outils : agenda, notes, web, écran…</li><li>Mémoire</li><li>Automatisations</li><li>Budget et coût estimé</li>
+      </ul>
+    </div>
+    <div class="band-visual reveal">
+      <figure class="shot shot-window" style="--w:100%; --x:0%; --y:0%">
+        <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+        <img src="img/chat.jpg" alt="La fenêtre AI Chat de Prism, avec ses conversations et une réponse contenant du code Swift" width="1600" height="1077" loading="lazy">
+      </figure>
+      <figure class="shot shot-float" style="--w:48%; --x:-6%; --y:62%">
+        <img src="img/ai-tools.jpg" alt="Les outils que l’IA peut appeler dans Prism" width="1520" height="952" loading="lazy">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Vert : fenêtres et système -->
+<section class="band band-flip" id="vert" style="--c:var(--green); --c-rgb:77,217,115">
+  <div class="wrap band-grid">
+    <div class="band-text reveal">
+      <p class="band-tag"><span class="swatch"></span><span class="lc">λ</span> 471 nm · Vert</p>
+      <h3 class="h3">Fenêtres, système</h3>
+      <p>38 rangements&nbsp;: moitiés, tiers, quarts, sixièmes, agrandir, centrer, écran suivant. Un raccourci répété fait défiler ½, ⅔, ⅓. Vos dispositions s’enregistrent et se rappellent d’un geste.</p>
+      <p>Wi-Fi, Bluetooth, son, micro, apparence, Night Shift, mode avion, caméra, volume par app&nbsp;: sans ouvrir les Réglages Système.</p>
+      <ul class="chips">
+        <li>Écarts réglables</li><li>Changer de fenêtre</li><li>Chercher dans les menus</li><li>Désinstaller une app</li><li>Touche Hyper</li><li>Fermeture auto des apps inactives</li>
+      </ul>
+    </div>
+    <div class="band-visual reveal">
+      <div class="desk" id="desk" aria-label="Animation : une fenêtre rangée par les commandes de Prism">
+        <div class="desk-bar"><span></span><b id="desk-command">Moitié gauche</b><em>↵</em></div>
+        <div class="desk-screen">
+          <div class="win win-a" id="win-main"><div class="win-top"><i></i><i></i><i></i></div><div class="win-lines"><i></i><i></i><i></i><i></i></div></div>
+          <div class="win win-b"><div class="win-top"><i></i><i></i><i></i></div></div>
+          <div class="win win-c"><div class="win-top"><i></i><i></i><i></i></div></div>
+        </div>
+      </div>
+      <figure class="shot shot-float" style="--w:48%; --x:54%; --y:58%">
+        <img src="img/system.jpg" alt="Commandes du système dans Prism : volume" width="1520" height="952" loading="lazy">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Bleu : notes, concentration, dictée, agenda -->
+<section class="band" id="bleu" style="--c:var(--blue); --c-rgb:64,153,255">
+  <div class="wrap band-grid">
+    <div class="band-text reveal">
+      <p class="band-tag"><span class="swatch"></span><span class="lc">λ</span> 438 nm · Bleu</p>
+      <h3 class="h3">Notes, concentration, dictée</h3>
+      <p>Une note flottante en Markdown vivant&nbsp;: titres, tâches, code, liens, menu «&nbsp;/&nbsp;». Des sessions de concentration qui bloquent les apps et les sites qui dispersent. La dictée sur l’appareil, avec un nettoyage par règles ou par l’IA.</p>
+      <p>Votre agenda dans la barre&nbsp;: la prochaine réunion, la visio à rejoindre (Zoom, Meet, Teams), un évènement à créer ou un créneau à bloquer.</p>
+      <ul class="chips">
+        <li>Plusieurs notes, épingles</li><li>Pause et report</li><li>Styles selon l’app</li><li>Disponibilités</li><li>Captures d’écran avec OCR</li>
+      </ul>
+    </div>
+    <div class="band-visual band-collage reveal">
+      <figure class="shot shot-raw" style="--w:30%; --x:0%; --y:0%">
+        <img src="img/notes.jpg" alt="Une note de Prism en Markdown, avec des tâches cochées" width="460" height="640" loading="lazy">
+      </figure>
+      <figure class="shot shot-float" style="--w:62%; --x:37%; --y:0%">
+        <img src="img/calendar.jpg" alt="L’agenda dans Prism, avec la prochaine réunion et son lien de visio" width="1520" height="952" loading="lazy">
+      </figure>
+      <figure class="shot shot-raw" style="--w:44%; --x:55%; --y:43%">
+        <img src="img/focus.jpg" alt="La barre de concentration de Prism et une app bloquée" width="780" height="520" loading="lazy">
+      </figure>
+      <figure class="shot shot-raw" style="--w:50%; --x:0%; --y:45%">
+        <img src="img/dictation.jpg" alt="La pilule de dictée de Prism" width="900" height="480" loading="lazy">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Violet : extensions Raycast -->
+<section class="band band-flip" id="violet" style="--c:var(--violet); --c-rgb:158,97,255">
+  <div class="wrap band-grid">
+    <div class="band-text reveal">
+      <p class="band-tag"><span class="swatch"></span><span class="lc">λ</span> 411 nm · Violet</p>
+      <h3 class="h3">Les extensions de Raycast</h3>
+      <p>Le Store d’extensions de Raycast s’ouvre dans Prism&nbsp;: recherche, installation, mises à jour. Les extensions tournent dans Node.js, sur une réimplémentation de <code>@raycast/api</code>&nbsp;: listes, grilles, formulaires, actions, barre des menus, OAuth.</p>
+      <p>Et les quelque 850 script commands de la communauté, à lire puis installer d’un geste. Vous développez une extension&nbsp;? Le mode développement la recharge à chaque modification.</p>
+      <ul class="chips">
+        <li>Commandes de barre des menus</li><li>Commandes en arrière-plan</li><li>Préférences dans le trousseau</li><li>Import d’extensions locales</li><li>Script commands <code>@raycast.*</code></li>
+      </ul>
+    </div>
+    <div class="band-visual reveal">
+      <figure class="shot" style="--w:90%; --x:0%; --y:0%">
+        <img src="img/extensions-store.jpg" alt="Le Store d’extensions de Raycast dans Prism" width="1520" height="952" loading="lazy">
+      </figure>
+      <figure class="shot shot-float" style="--w:54%; --x:46%; --y:54%">
+        <img src="img/script-store.jpg" alt="Le Store des script commands dans Prism : 856 commandes" width="1520" height="952" loading="lazy">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── Thèmes ─────────────── -->
+<section class="section" id="themes">
+  <div class="wrap">
+    <header class="sec-head center">
+      <p class="kicker"><span>03</span> Thèmes</p>
+      <h2 class="h2" data-text="Quatorze reflets">Quatorze reflets</h2>
+      <p class="lede">Huit thèmes sombres, quatre clairs, plus Prism sombre et Prism clair. Prism suit l’apparence du Mac, et un éditeur exporte vos thèmes en JSON.</p>
+    </header>
+    <div class="deck" id="deck" aria-label="Le lanceur dans ses quatorze thèmes"></div>
+    <p class="deck-name" id="deck-name" aria-live="polite">Prism sombre</p>
+  </div>
+</section>
+
+<!-- ─────────────── Tout le reste ─────────────── -->
+<section class="section" id="tout">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="kicker"><span>04</span> Tout le reste</p>
+      <h2 class="h2" data-text="Et ce n’est pas tout">Et ce n’est pas tout</h2>
+      <p class="lede">La liste complète est dans le <a href="https://github.com/Guillaume69/prism#fonctionnalit%C3%A9s">README</a>. Ou appuyez sur <span class="kbd">⌥</span><span class="kbd">Espace</span> pour la parcourir comme dans Prism.</p>
+    </header>
+
+    <div class="grid-all">
+      <article class="card" style="--c:var(--red)"><h4>Calculatrice</h4><p>Unités, devises, cryptos, fuseaux («&nbsp;5pm ldn in sf&nbsp;»), dates («&nbsp;lundi dans 3 semaines&nbsp;»), couleurs hex, rgb, hsl, lab, oklch, bases, px/rem, historique.</p></article>
+      <article class="card" style="--c:var(--red)"><h4>Fichiers et captures</h4><p>Spotlight en deux colonnes, aperçu Quick Look, dossiers à parcourir. Captures d’écran en grille, avec OCR et filtres <code>name:</code> <code>text:</code> <code>date:</code>.</p></article>
+      <article class="card" style="--c:var(--red)"><h4>Traduction</h4><p>Traduction Apple sur l’appareil, détection de la langue, «&nbsp;bonjour en anglais&nbsp;» dans la recherche, lecture à voix haute.</p></article>
+      <article class="card" style="--c:var(--orange)"><h4>Liens rapides</h4><p>Une bibliothèque modifiable, avec arguments, l’app de votre choix, l’onglet déjà ouvert, favicons et étiquettes.</p></article>
+      <article class="card" style="--c:var(--orange)"><h4>Emojis et symboles</h4><p>1 915 emojis en français et en anglais, tons de peau, 360 symboles Unicode, mots-clés personnels, suggestions de l’IA par le sens.</p></article>
+      <article class="card" style="--c:var(--yellow)"><h4>AI Chat</h4><p>Barre latérale, ⌘1 à ⌘9, branches, archivage, fichiers joints, dictée, créativité réglable, notifications quand une réponse arrive en arrière-plan.</p></article>
+      <article class="card" style="--c:var(--yellow)"><h4>Lecture de l’écran</h4><p>Envoyer à l’IA la fenêtre active, la sélection, l’écran ou une zone.</p></article>
+      <article class="card" style="--c:var(--yellow)"><h4>Utilisation de l’IA</h4><p>Requêtes et jetons par jour et par modèle, coût estimé, budget mensuel qui bloque les modèles payants une fois atteint.</p></article>
+      <article class="card" style="--c:var(--green)"><h4>Applications</h4><p>Nouvelle fenêtre, fichiers récents, forcer à quitter, redémarrer, désinstaller avec les fichiers d’assistance.</p></article>
+      <article class="card" style="--c:var(--green)"><h4>Touche Hyper</h4><p>Verr. Maj devient ⌃⌥⌘ (et ⇧ si vous voulez)&nbsp;; un appui bref garde son rôle.</p></article>
+      <article class="card" style="--c:var(--blue)"><h4>Calendrier et contacts</h4><p>Créer un évènement avec invitation, bloquer du temps, prochaine réunion dans la barre des menus, appeler ou écrire à un contact.</p></article>
+      <article class="card" style="--c:var(--blue)"><h4>Équipe</h4><p>Comme Raycast Teams, par un dossier partagé&nbsp;: snippets, liens rapides, commandes d’IA et agents publiés par chacun.</p></article>
+      <article class="card" style="--c:var(--blue)"><h4>Synchronisation</h4><p>Export chiffré <code>.prismconfig</code>, synchronisation par iCloud Drive, sauvegardes programmées.</p></article>
+      <article class="card" style="--c:var(--violet)"><h4>Commandes scripts</h4><p>Compatibles avec les script commands de Raycast&nbsp;: modes silent, compact, fullOutput, inline, arguments.</p></article>
+      <article class="card" style="--c:var(--violet)"><h4>Prism sur iPhone</h4><p>Une app compagnon pour l’IA, les notes, les snippets et les liens rapides, synchronisés par iCloud Drive. À construire depuis les sources.</p></article>
+      <article class="card" style="--c:var(--violet)"><h4>Pour le plaisir</h4><p>Mes statistiques, mode jeu, lanceur de jeux, et des confettis.</p></article>
+    </div>
+
+    <div class="facts">
+      <div><b>~720</b><span>vérifications automatiques</span></div>
+      <div><b>38</b><span>rangements de fenêtres</span></div>
+      <div><b>14</b><span>thèmes</span></div>
+      <div><b>0</b><span>dépendance Swift</span></div>
+    </div>
+
+    <p class="missing"><b>Ce qui n’a pas d’équivalent.</b> Les comptes Raycast (connexion, facturation, SSO)&nbsp;: Prism n’a pas de serveur, la synchronisation et l’équipe passent par un dossier. L’IA hébergée par Raycast, dont la génération d’images&nbsp;: Prism utilise les fournisseurs que vous configurez. Windows. Et l’app iPhone n’est pas sur l’App Store.</p>
+  </div>
+</section>
+
+<!-- ─────────────── Installer ─────────────── -->
+<section class="section install" id="installer">
+  <div class="wrap">
+    <header class="sec-head center">
+      <p class="kicker"><span>05</span> Installer</p>
+      <h2 class="h2" data-text="Trois étapes">Trois étapes</h2>
+      <p class="lede">macOS 14 ou plus, sur Apple silicon ou Intel. Apple Intelligence sur l’appareil demande macOS 26 et une puce Apple&nbsp;; les extensions Raycast demandent Node.js 18 ou plus.</p>
+    </header>
+
+    <ol class="steps">
+      <li class="step" style="--c:var(--red)">
+        <span class="step-n">1</span>
+        <h4>Télécharger</h4>
+        <p>Ouvrez le zip de la dernière release et glissez <b>Prism.app</b> dans Applications.</p>
+        <a class="btn btn-prism btn-small" href="https://github.com/Guillaume69/prism/releases/latest" data-download><span>Télécharger <span data-version-label>Prism 2.0</span></span></a>
+      </li>
+      <li class="step" style="--c:var(--yellow)">
+        <span class="step-n">2</span>
+        <h4>Ouvrir quand même</h4>
+        <p>Prism n’est pas notarié par Apple&nbsp;: au premier lancement, macOS le bloque. Réglages Système › Confidentialité et sécurité › <b>Ouvrir quand même</b>. Ou dans le Terminal&nbsp;:</p>
+        <div class="code"><code>xattr -dr com.apple.quarantine /Applications/Prism.app</code><button type="button" class="copy" data-copy="xattr -dr com.apple.quarantine /Applications/Prism.app">Copier</button></div>
+      </li>
+      <li class="step" style="--c:var(--blue)">
+        <span class="step-n">3</span>
+        <h4><span class="kbd">⌥</span><span class="kbd">Espace</span></h4>
+        <p>C’est parti. Pour coller dans les apps, ranger les fenêtres et développer les snippets, ajoutez Prism dans Confidentialité et sécurité › <b>Accessibilité</b>.</p>
+      </li>
+    </ol>
+
+    <div class="source">
+      <div>
+        <h4>Depuis les sources</h4>
+        <p>Les Command Line Tools suffisent (<code>xcode-select --install</code>). Le script construit <code>Prism.app</code>, l’installe et le lance.</p>
+      </div>
+      <div class="code code-block"><code>git clone https://github.com/Guillaume69/prism.git
+cd prism
+./scripts/install.sh</code><button type="button" class="copy" data-copy="git clone https://github.com/Guillaume69/prism.git&#10;cd prism&#10;./scripts/install.sh">Copier</button></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand"><img src="img/icon-256.png" alt="Icône de Prism" width="64" height="64" loading="lazy"><div><b>Prism</b><span>Un lanceur pour macOS.</span></div></div>
+    <p class="footer-legal">Prism est un projet indépendant, sans lien avec Raycast Technologies. Code sous licence MIT. Les extensions et script commands du Store de Raycast gardent leur propre licence.</p>
+    <nav class="footer-links" aria-label="Liens du projet">
+      <a href="https://github.com/Guillaume69/prism">GitHub</a>
+      <a href="https://github.com/Guillaume69/prism/releases">Releases</a>
+      <a href="https://github.com/Guillaume69/prism/blob/master/README.md">README</a>
+      <a href="https://github.com/Guillaume69/prism/blob/master/LICENSE">Licence</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- La barre, dans la page : ⌥ Espace -->
+<div class="lx" id="lx" hidden>
+  <div class="lx-backdrop" data-close-launcher></div>
+  <div class="lx-window" role="dialog" aria-modal="true" aria-label="Prism, démo dans la page">
+    <div class="lx-search">
+      <input id="lx-input" type="text" autocomplete="off" spellcheck="false" placeholder="Rechercher des fonctionnalités, calculer…" role="combobox" aria-expanded="true" aria-controls="lx-list" aria-autocomplete="list">
+      <span class="lx-badge">Démo web</span>
+    </div>
+    <div class="lx-body" id="lx-body">
+      <div id="lx-calc"></div>
+      <ul class="lx-list" id="lx-list" role="listbox" aria-label="Résultats"></ul>
+    </div>
+    <div class="lx-foot">
+      <span class="lx-foot-brand"><img src="img/favicon.png" alt="" width="18" height="18"> Prism</span>
+      <span class="lx-foot-action" id="lx-action">Ouvrir</span><span class="kbd">↵</span>
+      <span class="lx-sep"></span>
+      <span class="lx-foot-dim">Fermer</span><span class="kbd">Échap</span>
+    </div>
+  </div>
+</div>
+
+<noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
+</body>
+</html>

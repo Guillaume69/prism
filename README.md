@@ -1,10 +1,14 @@
 # Prism
 
+![Prism : un rayon blanc traverse le prisme et se décompose en six couleurs](docs/img/og.jpg)
+
 Un lanceur pour macOS inspiré de [Raycast](https://www.raycast.com/), fonctionnalités Pro comprises : une fenêtre flottante, ouverte au clavier, pour lancer les apps, calculer, retrouver le presse-papiers, développer des snippets, ranger les fenêtres, poser des questions à l'IA, traduire, dicter, prendre des notes, se concentrer…
 
 Natif (Swift, SwiftUI et AppKit), sans dépendance. Tout reste sur le Mac, sauf ce que vous envoyez vous-même à un service (taux de change, fournisseur d'IA en ligne, Store).
 
 Prism est un projet indépendant, sans lien avec Raycast Technologies.
+
+**Présentation et démo : [guillaume69.github.io/prism](https://guillaume69.github.io/prism/)**
 
 ## Installer
 
@@ -175,6 +179,7 @@ open --env PRISM_DEBUG=1 /Applications/Prism.app
 | `Sources/Prism/Services` | Coller, frappes, sélection, placeholders dynamiques, pastille de confirmation |
 | `Sources/Prism/Views` | Lanceur, formulaires, composants et thème, réglages |
 | `Sources/Prism/Features/<Domaine>` | Une fonctionnalité par dossier : un `enum …Feature: PrismFeature` (commandes, sections de la recherche, recherches de repli, onglet de réglages, liens profonds, autotests) |
+| `docs` | Le site du projet, publié par GitHub Pages : une page statique, sans étape de construction |
 
 Ajouter une fonctionnalité : créer son dossier, conformer un `enum` à `PrismFeature`, l'ajouter à `Features.all` (`App/Feature.swift`).
 
