@@ -1,0 +1,16 @@
+{
+  "name": "prism-raycast-host",
+  "private": true,
+  "description": "Hôte des extensions Raycast dans Prism : React, un réconciliateur et l'API @raycast/api réimplémentée.",
+  "scripts": {
+    "build": "esbuild src/host.js --bundle --platform=node --target=node18 --minify --define:process.env.NODE_ENV=\\\"production\\\" --outfile=dist/host.js --log-level=warning",
+    "test": "node test/run.js"
+  },
+  "dependencies": {
+    "react": "19.0.0",
+    "react-reconciler": "0.31.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}

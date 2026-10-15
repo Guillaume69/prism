@@ -1,0 +1,3 @@
+node_modules/
+.prism-build.log
+raycast-env.d.ts

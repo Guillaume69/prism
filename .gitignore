@@ -1,0 +1,12 @@
+.build/
+dist/
+.DS_Store
+*.xcodeproj
+# Le projet de l'app iOS est écrit à la main : il est suivi.
+!iOS/PrismMobile.xcodeproj
+.swiftpm/
+RaycastHost/node_modules/
+RaycastHost/dist/
+iOS/build/
+iOS/PrismMobile.xcodeproj/xcuserdata/
+iOS/PrismMobile.xcodeproj/project.xcworkspace/xcuserdata/

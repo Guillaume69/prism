@@ -1,0 +1,14 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "prism-check",
+  "title": "Prism Check",
+  "description": "Extension source d'essai : navigateur, fenêtres et rechargement en mode développement",
+  "icon": "icon.png",
+  "author": "prism",
+  "license": "MIT",
+  "commands": [
+    { "name": "system", "title": "Prism Check : système", "description": "Onglets, fenêtres et écrans (nombres seulement)", "mode": "view" }
+  ],
+  "dependencies": { "@raycast/api": "1.104.25" },
+  "devDependencies": { "@types/react": "19.0.10", "typescript": "5.8.2" }
+}

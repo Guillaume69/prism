@@ -1,0 +1,13 @@
+{
+  "name": "demo",
+  "title": "Démo",
+  "description": "Extension d'essai de l'hôte de Prism",
+  "icon": "icon.png",
+  "author": "prism",
+  "commands": [
+    { "name": "list", "title": "Liste", "mode": "view" },
+    { "name": "form", "title": "Formulaire", "mode": "view" },
+    { "name": "hud", "title": "HUD", "mode": "no-view", "arguments": [{ "name": "who", "type": "text", "placeholder": "Qui ?", "required": true }] }
+  ],
+  "preferences": [{ "name": "greeting", "type": "textfield", "title": "Salutation", "required": false, "default": "Bonjour" }]
+}

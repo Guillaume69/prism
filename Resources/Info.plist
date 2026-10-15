@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>fr</string>
+	<key>CFBundleDisplayName</key>
+	<string>Prism</string>
+	<key>CFBundleExecutable</key>
+	<string>Prism</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>app.prism.launcher</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Prism</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>app.prism.launcher</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>prism</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>3</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Prism pilote le Finder, System Events et votre navigateur pour les commandes système, les placeholders et le mode concentration.</string>
+	<key>NSAudioCaptureUsageDescription</key>
+	<string>Prism règle le volume de chaque app (mixeur de volume) en captant puis en rejouant son son.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Prism allume ou éteint le Bluetooth et connecte vos appareils appairés.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Prism affiche vos prochains évènements, rejoint vos réunions et crée des évènements.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Prism affiche vos prochains évènements, rejoint vos réunions et crée des évènements.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Prism affiche l’image de votre caméra dans la commande « Caméra » et en prend des photos à votre demande.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Prism cherche vos contacts pour les appeler, leur écrire ou copier leurs coordonnées.</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Prism, un lanceur pour macOS.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>macOS ne donne le nom des réseaux Wi-Fi à portée qu’aux apps autorisées à utiliser la localisation.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>macOS ne donne le nom des réseaux Wi-Fi à portée qu’aux apps autorisées à utiliser la localisation.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Prism transcrit votre voix en texte (dictée).</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Prism peut créer des rappels.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Prism transforme votre voix en texte, sur l’appareil quand c’est possible.</string>
+</dict>
+</plist>
