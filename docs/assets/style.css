@@ -518,7 +518,7 @@ body::after {
   overflow: hidden;
 }
 .desk-bar {
-  position: absolute; z-index: 3; top: 7%; left: 50%; transform: translateX(-50%);
+  position: absolute; z-index: 60; pointer-events: none; top: 7%; left: 50%; transform: translateX(-50%);
   display: flex; align-items: center; gap: 10px;
   width: 54%; padding: 9px 12px;
   background: rgba(30, 30, 32, .94);
@@ -536,8 +536,11 @@ body::after {
 .desk-bar em { font-style: normal; color: var(--faint); }
 .desk-screen { position: relative; aspect-ratio: 16 / 10; margin: 0; }
 .desk-screen::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3.4%; background: rgba(0, 0, 0, .35); }
+/* Les fenêtres se déplacent : à la souris partout, au doigt par la barre de titre. */
 .win {
   position: absolute;
+  cursor: grab;
+  user-select: none; -webkit-user-select: none;
   border-radius: 7px;
   background: rgba(38, 36, 46, .96);
   border: 1px solid rgba(255, 255, 255, .1);
@@ -545,6 +548,8 @@ body::after {
   transition: left .7s cubic-bezier(.2, .9, .2, 1), top .7s cubic-bezier(.2, .9, .2, 1), width .7s cubic-bezier(.2, .9, .2, 1), height .7s cubic-bezier(.2, .9, .2, 1);
   overflow: hidden;
 }
+.win.is-dragging { cursor: grabbing; transition: none; }
+.win-top { touch-action: none; }
 .win-top { display: flex; gap: 4px; padding: 6px 7px; border-bottom: 1px solid rgba(255, 255, 255, .06); }
 .win-top i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .2); }
 .win-a { z-index: 2; border-color: rgba(77, 217, 115, .7); box-shadow: 0 0 0 1px rgba(77, 217, 115, .4), 0 0 40px -6px rgba(77, 217, 115, .5); left: 2%; top: 6%; width: 47%; height: 91%; }
@@ -575,7 +580,24 @@ body::after {
 }
 .deck figure img { width: 100%; height: auto; }
 .deck figure.is-on { filter: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .3), 0 30px 80px -10px rgba(0, 0, 0, .9), 0 0 70px -10px var(--glow, rgba(255, 255, 255, .4)); }
-.deck-name { margin: 26px 0 0; text-align: center; font: 800 26px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; transition: color .4s; }
+.deck { outline: none; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.deck img { pointer-events: none; -webkit-user-drag: none; }
+.deck:focus-visible { outline: 2px solid rgba(255, 255, 255, .35); outline-offset: 8px; border-radius: 12px; }
+.deck-nav { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 26px; }
+.deck-name { margin: 0; min-width: 260px; text-align: center; font: 800 26px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; transition: color .4s; }
+.deck-arrow { display: grid; place-items: center; width: 40px; height: 40px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line-2); border-radius: 50%; cursor: pointer; transition: background .2s; }
+.deck-arrow:hover { background: rgba(255, 255, 255, .12); }
+.deck-arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.deck-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 900px; margin: 22px auto 0; }
+.deck-chips button { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 13px; color: var(--muted); background: rgba(255, 255, 255, .03); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+.deck-chips button i { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.deck-chips button:hover { color: var(--text); border-color: var(--line-2); }
+.deck-chips button[aria-pressed="true"] { color: #fff; background: rgba(255, 255, 255, .08); border-color: var(--accent); }
+@media (max-width: 560px) {
+  .deck-name { min-width: 0; font-size: 21px; }
+  .deck-chips { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; margin: 18px calc(var(--gutter) * -1) 0; padding: 0 var(--gutter); }
+  .deck-chips button { flex: none; }
+}
 
 /* ── Tout le reste ── */
 .grid-all { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
@@ -683,6 +705,7 @@ body::after {
 }
 @keyframes fade { from { opacity: 0; } }
 @keyframes pop { from { opacity: 0; transform: scale(.96) translateY(-6px); } }
+.lx-window.is-dragging { cursor: grabbing; user-select: none; -webkit-user-select: none; }
 .lx-search { flex: none; display: flex; align-items: center; height: 58px; padding: 0 16px 0 18px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
 .lx-search input { flex: 1; min-width: 0; height: 100%; background: none; border: 0; outline: 0; color: #fff; font: 400 21px/1 var(--sans); }
 .lx-search input::placeholder { color: rgba(255, 255, 255, .38); }

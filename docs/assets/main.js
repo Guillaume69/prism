@@ -157,14 +157,15 @@
       ["Agrandir", [gap, top, 100 - gap * 2, full]],
       ["Centrer", [20, 16, 60, 70]],
     ];
-    const bar = $(".desk-bar", desk);
-    let i = 0;
+    const bar = $(".desk-bar", desk), screen = $(".desk-screen", desk);
+    let i = 0, paused = false, resumeTimer = 0, zTop = 3;
     const move = ([x, y, w, h]) => Object.assign(win.style, { left: `${x}%`, top: `${y}%`, width: `${w}%`, height: `${h}%` });
     const step = () => {
+      if (paused) return;
       const [name, box] = L[i];
       label.textContent = name;
       bar.classList.add("is-on");
-      setTimeout(() => { bar.classList.remove("is-on"); move(box); }, 750);
+      setTimeout(() => { if (paused) return; bar.classList.remove("is-on"); move(box); }, 750);
       i = (i + 1) % L.length;
     };
     move(L[L.length - 1][1]);
@@ -176,6 +177,35 @@
         if (e.isIntersecting) { step(); timer = setInterval(step, 2000); }
       }, { threshold: 0.3 }).observe(desk);
     }
+    // Les fenêtres se déplacent à la souris (au doigt : par la barre de titre). La démo reprend six secondes après.
+    $$(".win", desk).forEach((w) => {
+      w.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0 || (e.pointerType !== "mouse" && !e.target.closest(".win-top"))) return;
+        e.preventDefault();
+        paused = true;
+        clearTimeout(resumeTimer);
+        bar.classList.remove("is-on");
+        const r = screen.getBoundingClientRect(), b = w.getBoundingClientRect();
+        const ox = e.clientX - b.left, oy = e.clientY - b.top;
+        w.style.zIndex = String(++zTop);
+        w.classList.add("is-dragging");
+        w.setPointerCapture(e.pointerId);
+        const drag = (ev) => {
+          const x = Math.min(Math.max(ev.clientX - r.left - ox, -b.width * 0.7), r.width - b.width * 0.3);
+          const y = Math.min(Math.max(ev.clientY - r.top - oy, r.height * 0.034), r.height - 24);
+          w.style.left = `${(x / r.width) * 100}%`;
+          w.style.top = `${(y / r.height) * 100}%`;
+        };
+        const drop = () => {
+          w.removeEventListener("pointermove", drag);
+          w.classList.remove("is-dragging");
+          resumeTimer = setTimeout(() => { paused = false; }, 6000);
+        };
+        w.addEventListener("pointermove", drag);
+        w.addEventListener("pointerup", drop, { once: true });
+        w.addEventListener("pointercancel", drop, { once: true });
+      });
+    });
   }
 
   // ── Éventail des thèmes ──
@@ -189,7 +219,7 @@
   const deck = $("#deck"), deckName = $("#deck-name");
   if (deck) {
     deck.innerHTML = THEMES.map(([id, name, accent], i) =>
-      `<figure style="--glow:${accent}66" data-i="${i}"><img src="img/themes/${id}.jpg" alt="Le lanceur avec le thème ${name}" width="960" height="601" loading="lazy"></figure>`).join("");
+      `<figure style="--glow:${accent}66" data-i="${i}"><img src="img/themes/${id}.jpg" alt="Le lanceur avec le thème ${name}" width="960" height="601" loading="lazy" draggable="false"></figure>`).join("");
     const cards = $$("figure", deck);
     let active = 0, auto = 0;
     // La carte active au centre, les autres de part et d'autre, tournées comme dans Cover Flow.
@@ -211,15 +241,40 @@
       deckName.textContent = THEMES[active][1];
       deckName.style.color = THEMES[active][2];
     };
-    const select = (i) => { active = (i + cards.length) % cards.length; layout(); };
-    cards.forEach((c, i) => {
-      c.addEventListener("click", () => { select(i); restart(); });
-      if (fine) c.addEventListener("pointerenter", () => { select(i); clearInterval(auto); });
+    const chips = $("#deck-chips");
+    chips.innerHTML = THEMES.map(([id, name, accent], i) =>
+      `<button type="button" data-i="${i}" style="--accent:${accent}" aria-pressed="false"><i></i>${name}</button>`).join("");
+    const chipButtons = $$("button", chips);
+    const select = (i) => {
+      active = (i + cards.length) % cards.length;
+      layout();
+      chipButtons.forEach((b, j) => b.setAttribute("aria-pressed", String(j === active)));
+      // Sur téléphone, la liste défile : le thème choisi reste visible.
+      const chip = chipButtons[active];
+      if (chips.scrollWidth > chips.clientWidth) chips.scrollTo({ left: chip.offsetLeft - chips.clientWidth / 2 + chip.offsetWidth / 2, behavior: reduce ? "auto" : "smooth" });
+    };
+    // Défilement automatique, suspendu dix secondes après chaque geste.
+    let idle = 0, visible = false;
+    const restart = () => { clearInterval(auto); if (!reduce && visible) auto = setInterval(() => select(active + 1), 2200); };
+    const touched = () => { clearInterval(auto); clearTimeout(idle); idle = setTimeout(restart, 10000); };
+    const choose = (i) => { select(i); touched(); };
+    cards.forEach((c, i) => c.addEventListener("click", () => { if (!swiped) choose(i); }));
+    chipButtons.forEach((b, i) => b.addEventListener("click", () => choose(i)));
+    $$("[data-deck]").forEach((b) => b.addEventListener("click", () => choose(active + Number(b.dataset.deck))));
+    deck.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { choose(active + 1); e.preventDefault(); }
+      if (e.key === "ArrowLeft") { choose(active - 1); e.preventDefault(); }
     });
-    deck.addEventListener("pointerleave", () => restart());
-    const restart = () => { clearInterval(auto); if (!reduce) auto = setInterval(() => select(active + 1), 1600); };
-    layout();
-    new IntersectionObserver(([e]) => { if (e.isIntersecting) restart(); else clearInterval(auto); }, { threshold: 0.3 }).observe(deck);
+    let startX = null, swiped = false;
+    deck.addEventListener("pointerdown", (e) => { startX = e.clientX; swiped = false; });
+    deck.addEventListener("pointerup", (e) => {
+      if (startX === null) return;
+      const dx = e.clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 40) { swiped = true; choose(active + (dx < 0 ? 1 : -1)); }
+    });
+    select(0);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) restart(); else clearInterval(auto); }, { threshold: 0.3 }).observe(deck);
     addEventListener("resize", layout);
   }
 
@@ -471,6 +526,28 @@
     lx.hidden = true;
     lastFocus?.focus?.();
   }
+  // Comme une fenêtre : on la déplace en la tenant par son cadre (hors du champ et des résultats).
+  const lxWindow = $(".lx-window");
+  let offset = { x: 0, y: 0 };
+  lxWindow.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || e.target.closest("input, .lx-row, button, a")) return;
+    e.preventDefault();
+    const start = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+    const box = lxWindow.getBoundingClientRect();
+    const base = { left: box.left - offset.x, top: box.top - offset.y };
+    lxWindow.classList.add("is-dragging");
+    lxWindow.setPointerCapture(e.pointerId);
+    const drag = (ev) => {
+      const x = Math.min(Math.max(ev.clientX - start.x, -base.left - box.width + 80), innerWidth - base.left - 80);
+      const y = Math.min(Math.max(ev.clientY - start.y, -base.top), innerHeight - base.top - 50);
+      offset = { x, y };
+      lxWindow.style.translate = `${x}px ${y}px`;
+    };
+    const drop = () => { lxWindow.removeEventListener("pointermove", drag); lxWindow.classList.remove("is-dragging"); input.focus(); };
+    lxWindow.addEventListener("pointermove", drag);
+    lxWindow.addEventListener("pointerup", drop, { once: true });
+    lxWindow.addEventListener("pointercancel", drop, { once: true });
+  });
   input.addEventListener("input", renderLauncher);
   input.addEventListener("keydown", (e) => {
     const max = rows.length - 1;

@@ -330,8 +330,13 @@
       <h2 class="h2" data-text="Quatorze reflets">Quatorze reflets</h2>
       <p class="lede">Huit thèmes sombres, quatre clairs, plus Prism sombre et Prism clair. Prism suit l’apparence du Mac, et un éditeur exporte vos thèmes en JSON.</p>
     </header>
-    <div class="deck" id="deck" aria-label="Le lanceur dans ses quatorze thèmes"></div>
-    <p class="deck-name" id="deck-name" aria-live="polite">Prism sombre</p>
+    <div class="deck" id="deck" tabindex="0" aria-label="Le lanceur dans ses quatorze thèmes. Flèches gauche et droite pour changer."></div>
+    <div class="deck-nav">
+      <button type="button" class="deck-arrow" data-deck="-1" aria-label="Thème précédent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+      <p class="deck-name" id="deck-name" aria-live="polite">Prism sombre</p>
+      <button type="button" class="deck-arrow" data-deck="1" aria-label="Thème suivant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+    </div>
+    <div class="deck-chips" id="deck-chips" aria-label="Choisir un thème"></div>
   </div>
 </section>
 
