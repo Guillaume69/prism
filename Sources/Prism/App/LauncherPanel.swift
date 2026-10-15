@@ -39,6 +39,10 @@ final class LauncherPanelController: NSObject, NSWindowDelegate {
     private var subscriptions: Set<AnyCancellable> = []
     /// Garde le lanceur ouvert quand une autre fenêtre de Prism passe devant (aperçu, menu).
     var keepOpenOnResign = false
+    /// Vrai pendant les déplacements faits par Prism (placement, hauteur), pour ne retenir que ceux de l'utilisateur.
+    private var movingProgrammatically = false
+    /// La place choisie en déplaçant la fenêtre : centre horizontal et haut, en fractions de l'écran.
+    private static let positionKey = "launcherPosition"
 
     var isVisible: Bool { panel.isVisible && panel.alphaValue > 0 }
     var window: NSWindow { panel }
@@ -93,6 +97,12 @@ final class LauncherPanelController: NSObject, NSWindowDelegate {
             .store(in: &subscriptions)
         NotificationCenter.default.addObserver(forName: .prismThemeDidChange, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.applyTheme() }
+        }
+        NotificationCenter.default.addObserver(forName: .prismLauncherResetPosition, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                UserDefaults.standard.removeObject(forKey: Self.positionKey)
+                self?.position()
+            }
         }
         AppContext.launcher = self
     }
@@ -185,7 +195,9 @@ final class LauncherPanelController: NSObject, NSWindowDelegate {
             frame.origin.y += frame.height - size.height
             frame.origin.x += (frame.width - size.width) / 2
             frame.size = size
+            movingProgrammatically = true
             panel.setFrame(frame, display: true, animate: false)
+            movingProgrammatically = false
             panel.invalidateShadow()
         }
     }
@@ -220,8 +232,24 @@ final class LauncherPanelController: NSObject, NSWindowDelegate {
         }
         guard let area = screen?.visibleFrame else { return }
         let size = panel.frame.size
-        let top = area.maxY - area.height * 0.18
-        panel.setFrameOrigin(NSPoint(x: (area.midX - size.width / 2).rounded(), y: (top - size.height).rounded()))
+        // À la place où on l'a déplacé, sinon centré dans le tiers haut ; toujours entier à l'écran.
+        var centerX = area.midX, top = area.maxY - area.height * 0.18
+        if let saved = UserDefaults.standard.array(forKey: Self.positionKey) as? [Double], saved.count == 2 {
+            centerX = area.minX + CGFloat(saved[0]) * area.width
+            top = area.maxY - CGFloat(saved[1]) * area.height
+        }
+        let x = min(max(centerX - size.width / 2, area.minX), area.maxX - size.width)
+        let y = min(max(top - size.height, area.minY), area.maxY - size.height)
+        movingProgrammatically = true
+        panel.setFrameOrigin(NSPoint(x: x.rounded(), y: y.rounded()))
+        movingProgrammatically = false
+    }
+
+    /// L'utilisateur a déplacé la fenêtre : elle rouvrira à cette place, sur l'écran où elle s'ouvre.
+    func windowDidMove(_ notification: Notification) {
+        guard !movingProgrammatically, panel.isVisible, let area = panel.screen?.visibleFrame, area.width > 0, area.height > 0 else { return }
+        let frame = panel.frame
+        UserDefaults.standard.set([Double((frame.midX - area.minX) / area.width), Double((area.maxY - frame.maxY) / area.height)], forKey: Self.positionKey)
     }
 
     // MARK: - Clavier

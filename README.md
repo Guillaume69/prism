@@ -69,6 +69,7 @@ Pour que macOS garde les autorisations de Prism d'un build à l'autre, créez un
 - **Recherches de repli** (Google, presse-papiers, emojis, fichiers, IA, scripts) : à activer et ordonner dans les réglages.
 - Recherche floue sans accents, par initiales (« vsc »), sensibilité réglable.
 - **Mode compact** : seulement la barre de recherche tant qu'on n'a rien tapé, avec les favoris en icônes si on le souhaite.
+- **Fenêtre** : elle se déplace en la tenant par le pied ou par le bord de la barre de recherche, et rouvre à la même place ; un double-clic la remet au centre.
 - **Réglages du lanceur** : taille de l'interface, écran d'ouverture (souris, fenêtre active, principal), source de saisie à l'ouverture, fournisseur des icônes de sites, historique des recherches, recherche dans les réglages.
 - **Liens profonds** : `prism://commands/<id>?arguments=…` (⌘K › Copier le lien profond), `prism://search?q=…`, et ceux de chaque fonctionnalité.
 
@@ -98,7 +99,7 @@ Pour que macOS garde les autorisations de Prism d'un build à l'autre, créez un
 | **Commandes scripts** | Compatibles avec les script commands de Raycast (`@raycast.*`), modes silent, compact, fullOutput, inline, arguments |
 | **Store** | Les ~850 script commands de la communauté Raycast, à lire puis installer d'un geste |
 | **Extensions Raycast** | Le **Store d'extensions de Raycast** dans Prism : recherche, installation, mises à jour, désinstallation. Les extensions tournent dans Node.js avec une réimplémentation de `@raycast/api` (listes, grilles, détails, formulaires, panneaux d'actions, navigation, menus déroulants, toasts, HUD, presse-papiers, stockage local, cache, préférences dans le trousseau, arguments, `launchCommand`, IA de Prism, OAuth) ; `BrowserExtension` par AppleScript (onglets et pages de Safari et des navigateurs Chromium), `WindowManagement` par l'accessibilité ; commandes de barre des menus dans la vraie barre des menus, commandes à intervalle en arrière-plan ; **import d'extensions locales** (construites, ou sources construites par leur CLI `ray`) et **mode développement** (reconstruction et rechargement à chaque modification, comme `ray develop`) ; journal par extension |
-| **Thèmes** | 14 thèmes (clair et sombre), éditeur, import et export en JSON |
+| **Thèmes** | 14 thèmes (clair et sombre), éditeur, import et export en JSON ; apparence : celle du Mac, toujours sombre ou toujours claire (un thème choisi s'affiche tout de suite) |
 | **Touche Hyper** | Verr. Maj (ou une autre touche) devient ⌃⌥⌘ (+⇧), appui bref configurable |
 | **Équipe** | Comme Raycast Teams, par un dossier partagé (iCloud Drive partagé, Dropbox, réseau) : snippets, liens rapides, commandes d'IA et agents publiés par chacun, présents chez tous dans la recherche (étiquette « Équipe », auteur), copiables dans ses propres données ; « Partager avec l'équipe », « Retirer de l'équipe » |
 | **Utilisation de l'IA** | À la place des crédits de Raycast : requêtes et jetons par jour et par modèle, coût estimé (tarifs modifiables dans `ai-prices.json`), budget mensuel qui bloque les modèles payants une fois atteint (Apple Intelligence et Ollama restent libres), alerte à 80 % |

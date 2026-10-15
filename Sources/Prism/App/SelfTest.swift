@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 /// Vérifications de la logique sans interface : `Prism --selftest`.
 @MainActor
@@ -100,6 +101,26 @@ enum SelfTest {
         check(chord.flagsChanged([], at: 0.25) == nil, "⌘C puis ⌘ n’est pas un double appui")
         check(Hotkey.doubleTap(.option).label == "⌥⌥" && Hotkey.doubleTap(.option).isValid, "libellé ⌥⌥")
         check(HotkeyCoding.decode(HotkeyCoding.encode(Hotkey.doubleTap(.control)))?.tapModifier == .control, "double appui enregistré puis relu")
+
+        print("— Fenêtre du lanceur")
+        let launcherModel = LauncherModel()
+        launcherModel.prepareForShow(reset: true)
+        let launcherHost = NSHostingView(rootView: LauncherView(model: launcherModel) { _ in })
+        launcherHost.frame = NSRect(x: 0, y: 0, width: LauncherLayout.width, height: LauncherLayout.height)
+        let hostWindow = NSWindow(contentRect: launcherHost.frame, styleMask: [.borderless], backing: .buffered, defer: false)
+        hostWindow.contentView = launcherHost
+        launcherHost.layoutSubtreeIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        // La vue qui reçoit un clic, en un point compté depuis le haut à gauche.
+        func hit(_ x: CGFloat, _ yFromTop: CGFloat) -> NSView? {
+            let y = launcherHost.isFlipped ? yFromTop : launcherHost.bounds.height - yFromTop
+            return launcherHost.hitTest(launcherHost.convert(NSPoint(x: x, y: y), to: launcherHost.superview))
+        }
+        let footerY = LauncherLayout.height - LauncherLayout.footerHeight / 2
+        check(hit(LauncherLayout.width / 2, 6) is WindowDragArea.DragView, "le bord de la barre de recherche déplace la fenêtre")
+        check(hit(LauncherLayout.width / 2, LauncherLayout.searchHeight / 2).map { !($0 is WindowDragArea.DragView) } == true, "le champ de recherche reste cliquable")
+        check(hit(300, footerY) is WindowDragArea.DragView, "le pied déplace la fenêtre")
+        check(hit(LauncherLayout.width - 30, footerY).map { !($0 is WindowDragArea.DragView) } == true, "le bouton Actions reste cliquable")
 
         for feature in Features.all {
             var printedHeader = false

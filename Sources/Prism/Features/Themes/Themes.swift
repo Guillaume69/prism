@@ -46,8 +46,10 @@ final class ThemeStore: ObservableObject {
         var custom: [PrismTheme] = []
         var darkTheme = PrismTheme.prismDark.id
         var lightTheme = PrismTheme.prismLight.id
-        /// Suivre l'apparence du système (sinon : toujours le thème sombre).
+        /// Suivre l'apparence du système ; sinon, celle de `fixedAppearance`.
         var followSystem = true
+        /// « dark » ou « light » quand Prism ne suit pas le système (absent : sombre, comme avant).
+        var fixedAppearance: String?
     }
 
     let store = JSONStore("themes.json", default: Content())
@@ -72,14 +74,31 @@ final class ThemeStore: ObservableObject {
             || UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark"
     }
 
-    /// Le thème en vigueur, selon l'apparence du système.
+    /// Le thème en vigueur, selon l'apparence du système ou celle qu'on a fixée.
     var current: PrismTheme {
-        let dark = !data.followSystem || systemIsDark
+        let dark = Self.showsDark(data, systemIsDark: systemIsDark)
         return theme(dark ? data.darkTheme : data.lightTheme) ?? (dark ? .prismDark : .prismLight)
     }
 
     func apply(_ theme: PrismTheme) {
-        if theme.isDark { data.darkTheme = theme.id } else { data.lightTheme = theme.id }
+        data = Self.applying(theme, to: data, systemIsDark: systemIsDark)
+    }
+
+    /// Le thème sombre est-il celui qui s'affiche ?
+    static func showsDark(_ content: Content, systemIsDark: Bool) -> Bool {
+        content.followSystem ? systemIsDark : content.fixedAppearance != "light"
+    }
+
+    /// Un thème choisi se voit tout de suite : s'il n'est pas de l'apparence en vigueur
+    /// (un thème clair quand le Mac est en mode sombre), Prism cesse de suivre le système et prend la sienne.
+    static func applying(_ theme: PrismTheme, to content: Content, systemIsDark: Bool) -> Content {
+        var content = content
+        if theme.isDark { content.darkTheme = theme.id } else { content.lightTheme = theme.id }
+        if theme.isDark != showsDark(content, systemIsDark: systemIsDark) {
+            content.followSystem = false
+            content.fixedAppearance = theme.appearance
+        }
+        return content
     }
 
     func save(_ theme: PrismTheme) {
@@ -148,7 +167,10 @@ enum ThemesFeature: PrismFeature {
             let normalized = query.normalizedForSearch
             @MainActor func items(_ dark: Bool) -> [ResultItem] {
                 store.all.filter { $0.isDark == dark && (normalized.isEmpty || Fuzzy.score(normalized, $0.name) != nil) }.map { theme in
-                    let active = (dark ? store.data.darkTheme : store.data.lightTheme) == theme.id
+                    // « Actif » : le thème affiché. L'autre apparence garde le sien, utilisé quand le Mac en change.
+                    let shown = store.current.id == theme.id
+                    let slot = (dark ? store.data.darkTheme : store.data.lightTheme) == theme.id
+                    let accessory = shown ? "Actif" : slot && store.data.followSystem ? (dark ? "Mode sombre" : "Mode clair") : nil
                     var actions = [
                         ItemAction(title: "Appliquer le thème", symbol: "paintbrush") {
                             store.apply(theme)
@@ -179,7 +201,7 @@ enum ThemesFeature: PrismFeature {
                         title: theme.name,
                         subtitle: theme.isBuiltIn ? "Intégré" : "Personnalisé",
                         icon: .color(NSColor(hex: theme.accent) ?? .systemRed),
-                        accessory: active ? "Actif" : nil,
+                        accessory: accessory,
                         usageKey: "",
                         actions: actions
                     )
@@ -196,6 +218,21 @@ enum ThemesFeature: PrismFeature {
         [Command.screen("themes", "Changer de thème", subtitle: "Thèmes", symbol: "paintpalette.fill", color: Palette.pink, keywords: ["switch theme", "theme", "couleurs", "apparence"], screen: screen)]
     }
 
+    static func selfTest(_ check: (Bool, String) -> Void) {
+        let content = ThemeStore.Content(darkTheme: "midnight", lightTheme: "paper")
+        let light = ThemeStore.applying(.prismLight, to: content, systemIsDark: true)
+        check(!ThemeStore.showsDark(light, systemIsDark: true) && light.lightTheme == "prism-light" && !light.followSystem,
+              "Thèmes : un thème clair choisi quand le Mac est sombre s’affiche")
+        let back = ThemeStore.applying(.prismDark, to: light, systemIsDark: true)
+        check(ThemeStore.showsDark(back, systemIsDark: true) && back.darkTheme == "prism-dark", "Thèmes : un thème sombre choisi ensuite s’affiche")
+        let same = ThemeStore.applying(.prismDark, to: content, systemIsDark: true)
+        check(same.followSystem && same.darkTheme == "prism-dark", "Thèmes : un thème de l’apparence en vigueur garde le suivi du système")
+        check(!ThemeStore.showsDark(ThemeStore.applying(.prismLight, to: content, systemIsDark: false), systemIsDark: false),
+              "Thèmes : en mode clair, un thème clair s’affiche sans rien fixer")
+        let old = try? JSONDecoder().decode(ThemeStore.Content.self, from: Data(#"{"custom":[],"darkTheme":"nord","lightTheme":"paper","followSystem":false}"#.utf8))
+        check(old.map { ThemeStore.showsDark($0, systemIsDark: false) } == true, "Thèmes : un ancien réglage sans suivi du système reste sombre")
+    }
+
     static var settingsPanes: [SettingsPane] {
         [SettingsPane(id: "themes", title: "Thèmes", symbol: "paintpalette.fill", color: Palette.pink, order: 20) { AnyView(ThemeSettingsView()) }]
     }
@@ -210,10 +247,19 @@ struct ThemeSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Suivre l’apparence du système", isOn: Binding(
-                    get: { store.data.followSystem },
-                    set: { store.data.followSystem = $0 }
-                ))
+                Picker("Apparence", selection: Binding(
+                    get: { store.data.followSystem ? "system" : (store.data.fixedAppearance ?? "dark") },
+                    set: { value in
+                        var content = store.data
+                        content.followSystem = value == "system"
+                        if value != "system" { content.fixedAppearance = value }
+                        store.data = content
+                    }
+                )) {
+                    Text("Celle du Mac").tag("system")
+                    Text("Toujours sombre").tag("dark")
+                    Text("Toujours clair").tag("light")
+                }
                 Picker("Thème sombre", selection: Binding(get: { store.data.darkTheme }, set: { store.data.darkTheme = $0 })) {
                     ForEach(store.all.filter(\.isDark)) { Text($0.name).tag($0.id) }
                 }

@@ -195,6 +195,8 @@ extension Notification.Name {
     /// Une donnée affichée par le lanceur a changé : il recalcule l'écran courant.
     static let prismDataDidChange = Notification.Name("PrismDataDidChange")
     static let prismThemeDidChange = Notification.Name("PrismThemeDidChange")
+    /// Double-clic sur la barre du lanceur : il revient à sa place habituelle.
+    static let prismLauncherResetPosition = Notification.Name("PrismLauncherResetPosition")
 }
 
 /// L'application qui était au premier plan quand le lanceur s'est ouvert : c'est là qu'on colle et qu'on range les fenêtres.

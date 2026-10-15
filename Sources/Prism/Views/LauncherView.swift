@@ -9,6 +9,7 @@ struct LauncherView: View {
     var body: some View {
         VStack(spacing: 0) {
             SearchBar(model: model, onFieldCreated: onSearchFieldCreated)
+                .background(WindowDragArea(onDoubleClick: Self.resetPosition))
             if !model.compactFavorites.isEmpty {
                 CompactFavorites(model: model)
             }
@@ -39,6 +40,11 @@ struct LauncherView: View {
         )
         .animation(.easeOut(duration: 0.12), value: model.isActionPanelOpen)
         .environment(\.colorScheme, themes.current.isDark ? .dark : .light)
+    }
+
+    /// Double-clic sur la barre de recherche ou le pied : le lanceur revient à sa place habituelle.
+    fileprivate static func resetPosition(_ window: NSWindow) {
+        NotificationCenter.default.post(name: .prismLauncherResetPosition, object: window)
     }
 
     @ViewBuilder
@@ -571,7 +577,13 @@ private struct BottomBar: View {
         }
         .padding(.horizontal, 14)
         .frame(height: LauncherLayout.footerHeight)
-        .background(Theme.footer)
+        .background {
+            // Sous le contenu mais au-dessus du fond : le pied, hors boutons, déplace la fenêtre.
+            ZStack {
+                Theme.footer
+                WindowDragArea(onDoubleClick: LauncherView.resetPosition)
+            }
+        }
         .overlay(alignment: .top) { Rectangle().fill(Theme.separator).frame(height: 1) }
     }
 
