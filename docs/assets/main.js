@@ -219,7 +219,7 @@
   const deck = $("#deck"), deckName = $("#deck-name");
   if (deck) {
     deck.innerHTML = THEMES.map(([id, name, accent], i) =>
-      `<figure style="--glow:${accent}66" data-i="${i}"><img src="img/themes/${id}.jpg" alt="Le lanceur avec le thème ${name}" width="960" height="601" loading="lazy" draggable="false"></figure>`).join("");
+      `<figure style="--glow:${accent}66" data-i="${i}"><img src="img/themes/${id}.jpg" alt="L’historique du presse-papiers avec le thème ${name}" width="960" height="601" loading="lazy" draggable="false"></figure>`).join("");
     const cards = $$("figure", deck);
     let active = 0, auto = 0;
     // La carte active au centre, les autres de part et d'autre, tournées comme dans Cover Flow.
