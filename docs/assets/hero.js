@@ -8,7 +8,10 @@
   if (!hero || !canvas) return;
   const ctx = canvas.getContext("2d", { alpha: false });
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const root = document.documentElement;
+  // L'aberration du titre se règle sur le titre seul : sur la racine, toute la page recalculerait son style.
+  const title = document.querySelector(".title");
+  const small = matchMedia("(max-width: 700px)").matches;
+  let lastAb = "";
   const DEG = Math.PI / 180;
 
   // ── Couleurs : celles de l'icône, du rouge au violet ──
@@ -71,7 +74,7 @@
   let time = 0, running = true, visible = true;
   let samples = [];             // un rayon par longueur d'onde
   let beam = null;              // source et point d'entrée
-  const N = reduce ? 28 : 40;
+  const N = reduce || small ? 28 : 40;
   const families = [...document.querySelectorAll("#spectrum-labels a")];
 
   // Calques : le fond (dessiné une fois), et deux tampons basse définition pour le halo.
@@ -337,7 +340,8 @@
     const strength = 1 + boost * 2.2;
 
     // Halo : spectre et rayon dessinés en basse définition, puis agrandis (flou gratuit).
-    for (const [g, cv, s] of [[gA, glowA, 4], [gB, glowB, 12]]) {
+    // Sur téléphone, un seul tampon de halo suffit.
+    for (const [g, cv, s] of small ? [[gB, glowB, 12]] : [[gA, glowA, 4], [gB, glowB, 12]]) {
       g.setTransform(1, 0, 0, 1, 0, 0);
       g.clearRect(0, 0, cv.width, cv.height);
       g.setTransform(1 / s, 0, 0, 1 / s, 0, 0);
@@ -346,8 +350,8 @@
     }
     ctx.globalCompositeOperation = "lighter";
     ctx.imageSmoothingEnabled = true;
-    ctx.globalAlpha = 0.9; ctx.drawImage(glowB, 0, 0, W, H);
-    ctx.globalAlpha = 0.75; ctx.drawImage(glowA, 0, 0, W, H);
+    ctx.globalAlpha = small ? 1 : 0.9; ctx.drawImage(glowB, 0, 0, W, H);
+    if (!small) { ctx.globalAlpha = 0.75; ctx.drawImage(glowA, 0, 0, W, H); }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = "source-over";
 
@@ -503,7 +507,8 @@
       hud.lambda.textContent = u === null ? "—" : `${lambdaNm(u)} nm`;
     }
     const abBase = 3 + (pointer.x - 0.5) * 4;
-    root.style.setProperty("--ab", (abBase + boost * 12).toFixed(2));
+    const ab = (abBase + boost * 12).toFixed(1);
+    if (title && ab !== lastAb) { title.style.setProperty("--ab", ab); lastAb = ab; }
   }
 
   // ── Boucle ──

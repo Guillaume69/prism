@@ -117,9 +117,11 @@
     if (reduce) {
       calcBox.innerHTML = CALC.map(([q, r, c]) => line(q, r, c, q, true)).join("");
     } else {
-      let started = false;
+      let started = false, onScreen = false;
+      new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; }).observe(calcBox);
       const run = async () => {
-        const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+        // Hors de l'écran, la frappe attend : rien ne tourne pour rien.
+        const sleep = async (ms) => { await new Promise((res) => setTimeout(res, ms)); while (!onScreen) await new Promise((res) => setTimeout(res, 400)); };
         for (;;) {
           calcBox.innerHTML = "";
           for (const [q, r, cap] of CALC) {
@@ -219,12 +221,12 @@
   const deck = $("#deck"), deckName = $("#deck-name");
   if (deck) {
     deck.innerHTML = THEMES.map(([id, name, accent], i) =>
-      `<figure style="--glow:${accent}66" data-i="${i}"><img src="img/themes/${id}.jpg" alt="L’historique du presse-papiers avec le thème ${name}" width="960" height="601" loading="lazy" draggable="false"></figure>`).join("");
+      `<figure data-i="${i}"><img src="img/themes/${id}.jpg" alt="L’historique du presse-papiers avec le thème ${name}" width="960" height="601" loading="lazy" decoding="async" draggable="false"></figure>`).join("");
     const cards = $$("figure", deck);
     let active = 0, auto = 0;
     // La carte active au centre, les autres de part et d'autre, tournées comme dans Cover Flow.
     const layout = () => {
-      const n = cards.length, gap = Math.min(innerWidth * 0.11, 170);
+      const n = cards.length, gap = Math.min(innerWidth * 0.11, 170), reach = innerWidth < 700 ? 2 : 3;
       cards.forEach((c, i) => {
         let k = i - active;
         if (k > n / 2) k -= n;
@@ -233,13 +235,14 @@
         c.style.setProperty("--tx", `${side * (far ? gap * 0.9 + far * gap * 0.55 : 0)}px`);
         c.style.setProperty("--tz", `${far ? -140 - far * 60 : 40}px`);
         c.style.setProperty("--ry", `${-side * (far ? 42 : 0)}deg`);
-        c.style.setProperty("--o", far > 4 ? "0" : String(1 - far * 0.12));
+        c.style.setProperty("--o", far > reach ? "0" : String(1 - far * 0.12));
         c.style.zIndex = String(40 - far);
-        c.style.pointerEvents = far > 4 ? "none" : "";
+        c.hidden = far > reach;
         c.classList.toggle("is-on", k === 0);
       });
       deckName.textContent = THEMES[active][1];
       deckName.style.color = THEMES[active][2];
+      deck.style.setProperty("--deck-glow", `${THEMES[active][2]}55`);
     };
     const chips = $("#deck-chips");
     chips.innerHTML = THEMES.map(([id, name, accent], i) =>
